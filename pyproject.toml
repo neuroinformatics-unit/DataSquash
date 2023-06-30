@@ -1,6 +1,10 @@
 [project]
 name = "DataSquash"
-authors = [{name = "Niko Sirmpilatze", email= "niko.sirbiladze@gmail.com"}]
+authors = [
+    {name = "Adam Tyson", email = "code@adamltyson.com"},
+    {name = "Niko Sirmpilatze", email = "niko.sirbiladze@gmail.com"},
+    {name = "Joe Ziminski", email = "j.ziminski@ucl.ac.uk"},
+]
 description = "Data compression utilities for systems neuroscience."
 readme = "README.md"
 requires-python = ">=3.8.0"
