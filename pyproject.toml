@@ -7,7 +7,7 @@ authors = [
 ]
 description = "Data compression utilities for systems neuroscience."
 readme = "README.md"
-requires-python = ">=3.8.0"
+requires-python = ">=3.9.0"
 dynamic = ["version"]
 
 license = {text = "BSD-3-Clause"}
@@ -16,9 +16,9 @@ classifiers = [
     "Development Status :: 2 - Pre-Alpha",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
     "Operating System :: OS Independent",
     "License :: OSI Approved :: BSD License",
 ]
@@ -64,9 +64,9 @@ exclude = ["tests", "docs*"]
 addopts = "--cov=datasquash"
 
 [tool.black]
-target-version = ['py38', 'py39', 'py310']
+target-version = ['py39', 'py310', 'py311']
 skip-string-normalization = false
-line-length = 79
+line-length = 88
 
 [tool.setuptools_scm]
 
@@ -83,13 +83,37 @@ ignore = [
 
 
 [tool.ruff]
-line-length = 79
+line-length = 88
 exclude = ["__init__.py","build",".eggs"]
 select = ["I", "E", "F"]
 fix = true
 
 [tool.cibuildwheel]
-build = "cp38-* cp39-* cp310-*"
+build = "cp39-* cp310-* cp311-*"
 
 [tool.cibuildwheel.macos]
 archs = ["x86_64", "arm64"]
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+requires = tox-conda
+envlist = py{39,310,311}
+isolated_build = True
+
+[gh-actions]
+python =
+    3.9: py39
+    3.10: py310
+    3.11: py311
+
+[testenv]
+conda_deps =
+    ffmpeg
+conda_channels =
+    conda-forge
+extras =
+    dev
+commands =
+    pytest -v --color=yes --cov=datasquash --cov-report=xml
+"""
