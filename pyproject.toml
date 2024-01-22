@@ -66,7 +66,7 @@ addopts = "--cov=datasquash"
 [tool.black]
 target-version = ['py39', 'py310', 'py311']
 skip-string-normalization = false
-line-length = 79
+line-length = 88
 
 [tool.setuptools_scm]
 
@@ -83,7 +83,7 @@ ignore = [
 
 
 [tool.ruff]
-line-length = 79
+line-length = 88
 exclude = ["__init__.py","build",".eggs"]
 select = ["I", "E", "F"]
 fix = true
