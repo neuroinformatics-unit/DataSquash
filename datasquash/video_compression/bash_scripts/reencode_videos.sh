@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH -p cpu # partition: cpu, gpu, fast, medium
+#SBATCH -p gpu # partition: cpu, gpu, fast, medium
 #SBATCH -N 1   # number of nodes
 #SBATCH --mem 64G # memory pool for all cores
 #SBATCH -n 2 # number of cores
