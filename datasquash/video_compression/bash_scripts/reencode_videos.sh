@@ -1,11 +1,11 @@
 #!/bin/bash
 
-#SBATCH -p gpu # partition
+#SBATCH -p cpu # partition: cpu, gpu, fast, medium
 #SBATCH -N 1   # number of nodes
 #SBATCH --mem 64G # memory pool for all cores
 #SBATCH -n 2 # number of cores
 #SBATCH -t 3-00:00 # time (D-HH:MM)
-#SBATCH --gres gpu:1 # request 1 GPU (of any kind)
+#SBATCH --gres gpu:0 # request NO GPUs
 #SBATCH -o slurm_array.%N.%A-%a.out
 #SBATCH -e slurm_array.%N.%A-%a.err
 #SBATCH --mail-type=ALL
@@ -21,17 +21,16 @@
 # Input & output data
 # ----------------------
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
-INPUT_VIDEO=datasets/drosophila-melanogaster-courtship/20190128_113421.mp4
+INPUT_VIDEO=$PROJ_DIR/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4
 OUTPUT_SUBDIR=reencoded-videos
 
-CRF_VALUES=($(seq 5 5 25))
+CRF_VALUES=($(seq 17 17 51))
 # Check len(list of input crf values) matches max SLURM_ARRAY_TASK_COUNT
 # if not, exit
 if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#CRF_VALUES[@]} ]]; then
     echo "The number of array tasks does not match the number of crf inputs"
     exit 1
 fi
-
 
 
 # location of SLURM logs
@@ -59,19 +58,31 @@ do
 
     # Path to reencoded video
     filename_no_ext="$(basename "$SAMPLE" | sed 's/\(.*\)\..*/\1/')" # filename without extension
-    REENCODED_VIDEO_PATH="$REENCODED_VIDEOS_DIR/$filename_no_ext"_RE.$reencoded_extension
+    filename_out_no_ext="$filename_no_ext"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"  
+    REENCODED_VIDEO_PATH_MP4="$REENCODED_VIDEOS_DIR/$filename_out_no_ext".mp4  # must be .mp4?
+
+    # Print ffmpeg version to logs
+    ffmpeg -version 
+
+    # Print ffprobe to logs, check properties of initial video?
+    ffprobe -v error -show_streams $SAMPLE
 
     # Run ffmpeg with the corresponding crf value
-    ffmpeg -version  # print version to logs
+    # - y: Overwrite output files without asking.
+    # - c:v codec for the video stream (decoder if used in front of input, encoder if used in front of output). 
+    # - libx264: Sets the video compression to use H264. If RGB, use libx264rgb
+    # - preset superfast: Sets a number of parameters that enable reliable seeking
+    # - c:a # keep audio as is if present
     ffmpeg -y -i "$SAMPLE" \
     -c:v libx264 \
     -pix_fmt yuv420p \
     -preset superfast \
-    -crf "${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}" \  #15 \
-    $REENCODED_VIDEO_PATH
+    -crf "${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}" \
+    -c:a copy \
+    $REENCODED_VIDEO_PATH_MP4
 
 
-    echo "Reencoded video: $REENCODED_VIDEO_PATH"
+    echo "Reencoded video: $REENCODED_VIDEO_PATH_MP4"
     echo "--------"
 
 
@@ -82,7 +93,7 @@ do
     for ext in err out
     do
     cp slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-    /$REENCODED_VIDEOS_SUBDIR/"$filename_no_ext"_RE.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+    /$REENCODED_VIDEOS_SUBDIR/"$filename_out_no_ext".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
     done
 
     # Frame extraction logs
