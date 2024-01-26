@@ -93,7 +93,7 @@ do
     for ext in err out
     do
     cp slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-    /$REENCODED_VIDEOS_SUBDIR/"$filename_out_no_ext".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+    /$REENCODED_VIDEOS_DIR/"$filename_out_no_ext".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
     done
 
     # Frame extraction logs
