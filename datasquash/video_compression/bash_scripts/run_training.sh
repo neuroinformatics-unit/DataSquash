@@ -29,6 +29,8 @@ module load SLEAP
 # Input & output data
 # ----------------------
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
+
+# input videos
 INPUT_VIDEOS_LIST=(
     "$PROJ_DIR/input-videos/20190128_113421.mp4"
     "$PROJ_DIR/input-videos/20190128_113421_CRF17.mp4"
@@ -36,11 +38,11 @@ INPUT_VIDEOS_LIST=(
     "$PROJ_DIR/input-videos/20190128_113421_CRF51.mp4"
 )
 
-SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+# labels location
 SLEAP_LABELS_DIR="$PROJ_DIR/input-labels"
-mkdir -p $SLEAP_LABELS_DIR  # create if it doesnt exist
+SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+labels_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 
-DATASQUASH_REPO="/ceph/scratch/sminano/DataSquash"
 
 # Check len(list of input data) matches max SLURM_ARRAY_TASK_COUNT
 # if not, exit
@@ -53,19 +55,19 @@ fi
 # ----------------------------------------
 # Run training for each reencoded video
 # ----------------------------------------
+# labels files assumed to follow the naming convention:
+#  <SLEAP_LABELS_REF_FILE>_<video_filename_no_ext>.slp
+
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
 
-    # train sleap model
-    # OJO! video-paths is only checked if the video specified in .slp file is not accesible!
-
     # centroid model
     sleap-train \
         baseline.centroid.json \
-        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        "$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp \
         --video-paths "$INPUT_VIDEO" \
         --run_name $video_filename_no_ext \
         --suffix "_centroid_model" \
@@ -73,7 +75,7 @@ do
 
     # centred instance model
     sleap-train \
-        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        "$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp \
         --video-paths "$INPUT_VIDEO" \
         --run_name $video_filename_no_ext \
         --suffix "_centered_instance_model" \
