@@ -5,12 +5,12 @@
 #SBATCH --mem 64G # memory pool for all cores
 #SBATCH -n 2 # number of cores
 #SBATCH -t 3-00:00 # time (D-HH:MM)
-#SBATCH --gres gpu:1 # request 1 GPU (of any kind) -- select a specific one?
+#SBATCH --gres gpu:rtx5000:1 # request 1 GPU RTX5000
 #SBATCH -o slurm_array.%N.%A-%a.out
 #SBATCH -e slurm_array.%N.%A-%a.err
 #SBATCH --mail-type=ALL
 #SBATCH --mail-user=s.minano@ucl.ac.uk
-#SBATCH --array=0-2%4
+#SBATCH --array=0-3%4
 
 # Refs:
 # - https://sleap.ai/notebooks/Training_and_inference_on_an_example_dataset.html
@@ -56,13 +56,13 @@ for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename="$(basename "$INPUT_VIDEO")"
+    
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-
     OUTPUT_LABELS_FILE="$labels_filename_no_ext"_$video_filename_no_ext.slp
 
     python -m "$DATASQUASH_REPO/video_compression/generate_label_files.py" \
         $SLEAP_LABELS_FILE \
-        "$video_filename_no_ext".mp4 \
+        $video_filename \
         $OUTPUT_LABELS_FILE
 
     # check .slp file and print to logs
