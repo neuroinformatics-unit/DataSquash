@@ -6,3 +6,5 @@ recursive-exclude * __pycache__
 recursive-exclude * *.py[co]
 recursive-exclude docs *
 recursive-exclude tests *
+
+recursive-include datasquash *.sh

@@ -2,8 +2,9 @@ from pathlib import Path
 
 import sleap
 
-from datasquash.video_compression.generate_label_files import \
-    overwrite_video_in_slp_file
+from datasquash.video_compression.generate_label_files import (
+    overwrite_video_in_slp_file,
+)
 
 
 def test_overwrite_video_in_slp_file(tmp_path: Path):

@@ -34,12 +34,12 @@ def overwrite_video_in_slp_file(
     )
 
 
-def argument_parser() -> argparse.ArgumentParser:
+def argument_parser() -> argparse.Namespace:
     """Generate argument parser for .slp file generation.
 
     Returns
     -------
-    argparse.ArgumentParser
+    argparse.Namespace
         parser for CLI arguments
     """
     parser = argparse.ArgumentParser()
@@ -53,7 +53,7 @@ def argument_parser() -> argparse.ArgumentParser:
         help=(
             "new video path to link to in SLEAP labels file (.slp). "
             "If only a filename is provided, the video will be search in "
-            "the directory of the .slp file",
+            "the directory of the .slp file"
         ),
     )
     parser.add_argument(
@@ -65,7 +65,7 @@ def argument_parser() -> argparse.ArgumentParser:
 
 if __name__ == "__main__":
     # parse CLI arguments
-    args = argument_parser()
+    args = argument_parser()  # type: argparse.Namespace
 
     # Generate new .slp file
     overwrite_video_in_slp_file(

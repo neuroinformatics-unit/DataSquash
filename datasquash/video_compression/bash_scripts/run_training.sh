@@ -57,7 +57,7 @@ do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename="$(basename "$INPUT_VIDEO")"
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-    
+
     OUTPUT_LABELS_FILE="$labels_filename_no_ext"_$video_filename_no_ext.slp
 
     python -m "$DATASQUASH_REPO/video_compression/generate_label_files.py" \
@@ -74,9 +74,9 @@ done
 # # ----------------------------------------
 # # Run training for each reencoded video
 # # ----------------------------------------
-# # - for a top-down pipeline, you’ll have a different profile for each of the models: 
+# # - for a top-down pipeline, you’ll have a different profile for each of the models:
 # #   centroid.json and centered_instance.json,
-# # - for a bottom-up pipeline approach: multi_instance.json 
+# # - for a bottom-up pipeline approach: multi_instance.json
 
 # for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 # do
