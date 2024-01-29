@@ -59,10 +59,21 @@ do
 
     # Path to reencoded video
     filename_no_ext="$(basename "$SAMPLE" | sed 's/\(.*\)\..*/\1/')" # filename without extension
-    REENCODED_VIDEO_PATH="$REENCODED_VIDEOS_DIR/$filename_no_ext"_RE.$reencoded_extension
+    filename_out_no_ext="$filename_no_ext"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"
+    REENCODED_VIDEO_PATH_MP4="$REENCODED_VIDEOS_DIR/$filename_out_no_ext".mp4  # must be .mp4?
+
+    # Print ffmpeg version to logs
+    ffmpeg -version
+
+    # Print ffprobe to logs, check properties of initial video?
+    ffprobe -v error -show_streams $SAMPLE
 
     # Run ffmpeg with the corresponding crf value
-    ffmpeg -version  # print version to logs
+    # - y: Overwrite output files without asking.
+    # - c:v codec for the video stream (decoder if used in front of input, encoder if used in front of output).
+    # - libx264: Sets the video compression to use H264. If RGB, use libx264rgb
+    # - preset superfast: Sets a number of parameters that enable reliable seeking
+    # - c:a # keep audio as is if present
     ffmpeg -y -i "$SAMPLE" \
     -c:v libx264 \
     -pix_fmt yuv420p \
