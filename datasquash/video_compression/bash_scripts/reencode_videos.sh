@@ -37,7 +37,7 @@ fi
 LOG_DIR=$PROJ_DIR/logs
 mkdir -p $LOG_DIR  # create if it doesnt exist
 
-# set location of reencoded videos 
+# set location of reencoded videos
 REENCODED_VIDEOS_DIR=$PROJ_DIR/$OUTPUT_SUBDIR
 mkdir -p $REENCODED_VIDEOS_DIR # create if it doesnt exist
 
@@ -58,18 +58,18 @@ do
 
     # Path to reencoded video
     filename_no_ext="$(basename "$SAMPLE" | sed 's/\(.*\)\..*/\1/')" # filename without extension
-    filename_out_no_ext="$filename_no_ext"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"  
+    filename_out_no_ext="$filename_no_ext"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"
     REENCODED_VIDEO_PATH_MP4="$REENCODED_VIDEOS_DIR/$filename_out_no_ext".mp4  # must be .mp4?
 
     # Print ffmpeg version to logs
-    ffmpeg -version 
+    ffmpeg -version
 
     # Print ffprobe to logs, check properties of initial video?
     ffprobe -v error -show_streams $SAMPLE
 
     # Run ffmpeg with the corresponding crf value
     # - y: Overwrite output files without asking.
-    # - c:v codec for the video stream (decoder if used in front of input, encoder if used in front of output). 
+    # - c:v codec for the video stream (decoder if used in front of input, encoder if used in front of output).
     # - libx264: Sets the video compression to use H264. If RGB, use libx264rgb
     # - preset superfast: Sets a number of parameters that enable reliable seeking
     # - c:a # keep audio as is if present
