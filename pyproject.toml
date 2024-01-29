@@ -22,10 +22,6 @@ classifiers = [
     "Operating System :: OS Independent",
     "License :: OSI Approved :: BSD License",
 ]
-dependencies = [
-    "pandas",
-    "opencv-python"
-]
 
 [project.urls]
 "Homepage" = "https://github.com/neuroinformatics-unit/DataSquash"
