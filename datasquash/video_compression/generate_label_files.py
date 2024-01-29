@@ -17,7 +17,7 @@ def overwrite_video_in_slp_file(
     new_video_path : str
         new video path to link to in SLEAP labels file (.slp). If only a
         filename is provided, the video will be search in the directory of
-        the .slp file
+        the .slp file. Needs to be an acceptable extension (e.g. mp4, not MP4)
     output_labels_path : str
         path to output SLEAP labels file (.slp)
     """
@@ -26,6 +26,10 @@ def overwrite_video_in_slp_file(
         input_labels_path,
         new_video_path,  # if I specify filename it will look for this file
     )
+
+    # Check only one video and correctly assigned
+    assert len(labels.videos) == 1
+    assert labels.videos[0].filename == new_video_path
 
     # Save label file
     sleap.Labels.save_file(
