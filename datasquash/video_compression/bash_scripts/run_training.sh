@@ -49,64 +49,40 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
     exit 1
 fi
 
-# -----------------------------------------------------
-# Generate SLEAP label files linked to each video
-# -----------------------------------------------------
 
-labels_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
-
+# ----------------------------------------
+# Run training for each reencoded video
+# ----------------------------------------
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-    video_filename="$(basename "$INPUT_VIDEO")"
-
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-    OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp
+    echo "Input video: $INPUT_VIDEO"
 
-    python "$DATASQUASH_REPO/datasquash/video_compression/generate_label_files.py" \
-        $SLEAP_LABELS_REF_FILE \
-        $video_filename \
-        $OUTPUT_LABELS_FILE
+    # train sleap model
+    # OJO! video-paths is only checked if the video specified in .slp file is not accesible!
 
-    # check .slp file and print to logs
-    sleap-inspect "$OUTPUT_LABELS_FILE"
+    # centroid model
+    sleap-train \
+        baseline.centroid.json \
+        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        --video-paths "$INPUT_VIDEO" \
+        --run_name $video_filename_no_ext \
+        --suffix "_centroid_model" \
+        --tensorboard
 
+    # centred instance model
+    sleap-train \
+        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        --video-paths "$INPUT_VIDEO" \
+        --run_name $video_filename_no_ext \
+        --suffix "_centered_instance_model" \
+        --tensorboard
+
+    # TODO: print only if success
+    echo "Model trained on video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
+    echo "---"
 done
 
 
-# # ----------------------------------------
-# # Run training for each reencoded video
-# # ----------------------------------------
-# # - for a top-down pipeline, you’ll have a different profile for each of the models:
-# #   centroid.json and centered_instance.json,
-# # - for a bottom-up pipeline approach: multi_instance.json
-
-# for i in {1..${SLURM_ARRAY_TASK_COUNT}}
-# do
-#     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-#     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-#     echo "Input video: $INPUT_VIDEO"
-
-#     # train sleap model
-#     # OJO! vide-path is only checked if the video specified in .slp file is not accesible!
-
-#     # centroid model
-#     sleap-train \
-#         baseline.centroid.json \
-#         "$labels_filename_no_ext"_$video_filename_no_ext.slp \
-#         --video-paths "$INPUT_VIDEO" \
-#         --run_name $video_filename_no_ext \
-#         --suffix "_centroid_model" \
-#         --tensorboard
-
-#     # centred instance model
-#     sleap-train \
-#         "$labels_filename_no_ext"_$video_filename_no_ext.slp \
-#         --video-paths "$INPUT_VIDEO" \
-#         --run_name $video_filename_no_ext \
-#         --suffix "_centered_instance_model" \
-#         --tensorboard
-
-#     echo "Model trained on video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
-#     echo "---"
-# done
+# TODO: copy logs across
