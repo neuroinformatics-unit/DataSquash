@@ -21,7 +21,7 @@
 # Input & output data
 # ----------------------
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
-INPUT_VIDEO=$PROJ_DIR/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4
+INPUT_VIDEO=$PROJ_DIR/input-videos/20190128_113421.mp4
 OUTPUT_SUBDIR=input-videos
 
 CRF_VALUES=($(seq 17 17 51))
@@ -82,6 +82,7 @@ do
     $REENCODED_VIDEO_PATH_MP4
 
 
+    # print only if previous command is successful!
     echo "Reencoded video: $REENCODED_VIDEO_PATH_MP4"
     echo "--------"
 
