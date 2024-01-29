@@ -22,7 +22,7 @@
 # ----------------------
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
 INPUT_VIDEO=$PROJ_DIR/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4
-OUTPUT_SUBDIR=reencoded-videos
+OUTPUT_SUBDIR=input-videos
 
 CRF_VALUES=($(seq 17 17 51))
 # Check len(list of input crf values) matches max SLURM_ARRAY_TASK_COUNT
