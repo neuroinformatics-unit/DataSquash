@@ -63,7 +63,7 @@ do
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp
 
-    python -m "$DATASQUASH_REPO/video_compression/generate_label_files.py" \
+    python -m "$DATASQUASH_REPO/datasquash/video_compression/generate_label_files.py" \
         $SLEAP_LABELS_REF_FILE \
         $video_filename \
         $OUTPUT_LABELS_FILE
