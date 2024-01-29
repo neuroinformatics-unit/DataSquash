@@ -28,15 +28,16 @@ module load SLEAP
 # ----------------------
 # Input & output data
 # ----------------------
-# TODO: get all video files in one directory?
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
-# REENCODED_VIDEOS_DIR=$PROJ_DIR/reencoded-videos
 INPUT_VIDEOS_LIST=(
-    "$PROJ_DIR/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4"
-    "$PROJ_DIR/reencoded-videos/20190128_113421_CRF17.mp4"
-    "$PROJ_DIR/reencoded-videos/20190128_113421_CRF34.mp4"
-    "$PROJ_DIR/reencoded-videos/20190128_113421_CRF51.mp4"
+    "$PROJ_DIR/input-videos/20190128_113421.mp4"
+    "$PROJ_DIR/input-videos/20190128_113421_CRF17.mp4"
+    "$PROJ_DIR/input-videos/20190128_113421_CRF34.mp4"
+    "$PROJ_DIR/input-videos/20190128_113421_CRF51.mp4"
 )
+SLEAP_LABELS_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+
+DATASQUASH_REPO="/ceph/scratch/sminano/DataSquash"
 
 # Check len(list of input data) matches max SLURM_ARRAY_TASK_COUNT
 # if not, exit
@@ -44,6 +45,31 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
     echo "The number of array tasks does not match the number of inputs"
     exit 1
 fi
+
+# -----------------------------------------------------
+# Generate SLEAP label files linked to each video
+# -----------------------------------------------------
+
+labels_filename_no_ext="$(basename "$SLEAP_LABELS_FILE" | sed 's/\(.*\)\..*/\1/')"
+
+for i in {1..${SLURM_ARRAY_TASK_COUNT}}
+do
+    INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
+    video_filename="$(basename "$INPUT_VIDEO")"
+    video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
+
+    OUTPUT_LABELS_FILE="$labels_filename_no_ext"_$video_filename_no_ext.slp
+
+    python -m "$DATASQUASH_REPO/video_compression/generate_label_files.py" \
+        $SLEAP_LABELS_FILE \
+        "$video_filename_no_ext".mp4 \
+        $OUTPUT_LABELS_FILE
+
+    # check .slp file and print to logs
+    sleap-inspect "$OUTPUT_LABELS_FILE"
+
+done
+
 
 # ----------------------------------------
 # Run training for each reencoded video
@@ -55,44 +81,29 @@ fi
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-    # filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
+    video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
 
     # train sleap model
     # OJO! vide-path is only checked if the video specified in .slp file is not accesible!
+
+    # centroid model
     sleap-train \
-        multi_instance.json \  # training_job_path
-        "dataset/drosophila-melanogaster-courtship/courtship_labels.slp" \  # labels
-        --video-paths "$INPUT_VIDEO"
-        --run_name
-        --prefix
-        --suffix
+        baseline.centroid.json \
+        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        --video-paths "$INPUT_VIDEO" \
+        --run_name $video_filename_no_ext \
+        --suffix "_centroid_model" \
         --tensorboard
 
-    echo "Reencoded video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
+    # centred instance model
+    sleap-train \
+        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+        --video-paths "$INPUT_VIDEO" \
+        --run_name $video_filename_no_ext \
+        --suffix "_centered_instance_model" \
+        --tensorboard
+
+    echo "Model trained on video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
     echo "---"
 done
-
-# # bottom up
-# # multi_instance.json \  #----> ok?
-# sleap-train \
-#     multi_instance.json \
-#     "dataset/drosophila-melanogaster-courtship/courtship_labels.slp" \
-#     --run_name "courtship.centroid" \
-#     --video-paths "dataset/drosophila-melanogaster-courtship/20190128_113421.mp4"
-
-
-# # centroid model
-# sleap-train \
-#     baseline.centroid.json \
-#     "dataset/drosophila-melanogaster-courtship/courtship_labels.slp" \
-#     --run_name "courtship.centroid" \
-#     --video-paths "dataset/drosophila-melanogaster-courtship/20190128_113421.mp4"
-
-
-# # centred instance model
-# sleap-train \
-#     baseline_medium_rf.topdown.json \
-#     "dataset/drosophila-melanogaster-courtship/courtship_labels.slp" \
-#     --run_name "courtship.topdown_confmaps" \
-#     --video-paths "dataset/drosophila-melanogaster-courtship/20190128_113421.mp4"
