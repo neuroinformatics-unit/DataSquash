@@ -35,7 +35,10 @@ INPUT_VIDEOS_LIST=(
     "$PROJ_DIR/input-videos/20190128_113421_CRF34.mp4"
     "$PROJ_DIR/input-videos/20190128_113421_CRF51.mp4"
 )
-SLEAP_LABELS_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+
+SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+SLEAP_LABELS_DIR="$PROJ_DIR/input-labels"
+mkdir -p $SLEAP_LABELS_DIR  # create if it doesnt exist
 
 DATASQUASH_REPO="/ceph/scratch/sminano/DataSquash"
 
@@ -50,18 +53,18 @@ fi
 # Generate SLEAP label files linked to each video
 # -----------------------------------------------------
 
-labels_filename_no_ext="$(basename "$SLEAP_LABELS_FILE" | sed 's/\(.*\)\..*/\1/')"
+labels_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename="$(basename "$INPUT_VIDEO")"
-    
+
     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     OUTPUT_LABELS_FILE="$labels_filename_no_ext"_$video_filename_no_ext.slp
 
     python -m "$DATASQUASH_REPO/video_compression/generate_label_files.py" \
-        $SLEAP_LABELS_FILE \
+        $SLEAP_LABELS_REF_FILE \
         $video_filename \
         $OUTPUT_LABELS_FILE
 
