@@ -71,39 +71,39 @@ do
 done
 
 
-# ----------------------------------------
-# Run training for each reencoded video
-# ----------------------------------------
-# - for a top-down pipeline, you’ll have a different profile for each of the models: 
-#   centroid.json and centered_instance.json,
-# - for a bottom-up pipeline approach: multi_instance.json 
+# # ----------------------------------------
+# # Run training for each reencoded video
+# # ----------------------------------------
+# # - for a top-down pipeline, you’ll have a different profile for each of the models: 
+# #   centroid.json and centered_instance.json,
+# # - for a bottom-up pipeline approach: multi_instance.json 
 
-for i in {1..${SLURM_ARRAY_TASK_COUNT}}
-do
-    INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-    video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-    echo "Input video: $INPUT_VIDEO"
+# for i in {1..${SLURM_ARRAY_TASK_COUNT}}
+# do
+#     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
+#     video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
+#     echo "Input video: $INPUT_VIDEO"
 
-    # train sleap model
-    # OJO! vide-path is only checked if the video specified in .slp file is not accesible!
+#     # train sleap model
+#     # OJO! vide-path is only checked if the video specified in .slp file is not accesible!
 
-    # centroid model
-    sleap-train \
-        baseline.centroid.json \
-        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
-        --video-paths "$INPUT_VIDEO" \
-        --run_name $video_filename_no_ext \
-        --suffix "_centroid_model" \
-        --tensorboard
+#     # centroid model
+#     sleap-train \
+#         baseline.centroid.json \
+#         "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+#         --video-paths "$INPUT_VIDEO" \
+#         --run_name $video_filename_no_ext \
+#         --suffix "_centroid_model" \
+#         --tensorboard
 
-    # centred instance model
-    sleap-train \
-        "$labels_filename_no_ext"_$video_filename_no_ext.slp \
-        --video-paths "$INPUT_VIDEO" \
-        --run_name $video_filename_no_ext \
-        --suffix "_centered_instance_model" \
-        --tensorboard
+#     # centred instance model
+#     sleap-train \
+#         "$labels_filename_no_ext"_$video_filename_no_ext.slp \
+#         --video-paths "$INPUT_VIDEO" \
+#         --run_name $video_filename_no_ext \
+#         --suffix "_centered_instance_model" \
+#         --tensorboard
 
-    echo "Model trained on video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
-    echo "---"
-done
+#     echo "Model trained on video: $OUTPUT_DIR/$OUTPUT_SUBDIR/$filename_no_ext.mp4"
+#     echo "---"
+# done
