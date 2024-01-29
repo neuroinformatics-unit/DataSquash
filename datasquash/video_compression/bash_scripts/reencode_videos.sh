@@ -38,7 +38,7 @@ fi
 LOG_DIR=$PROJ_DIR/logs
 mkdir -p $LOG_DIR  # create if it doesnt exist
 
-# set location of reencoded videos 
+# set location of reencoded videos
 REENCODED_VIDEOS_DIR=$PROJ_DIR/$OUTPUT_SUBDIR
 mkdir -p $REENCODED_VIDEOS_DIR # create if it doesnt exist
 
