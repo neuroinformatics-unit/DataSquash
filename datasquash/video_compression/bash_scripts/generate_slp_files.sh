@@ -88,14 +88,17 @@ do
     # if successful: print to logs 
     # TODO: should this be in pytest instead?
     if [[ "$status_generate_slp_file" -eq 0 ]] ; then
+    
         # get filename from sleap-inspect output
-        sleap_inspect_output=$(sleap-inspect "$OUTPUT_LABELS_FILE")
+        sleap_inspect_output=$(sleap-inspect $OUTPUT_LABELS_FILE)
 
-        # get line after Video files and remove spaces
-        video_filename_from_inspect="$(echo $sleap_inspect_output | sed -n '/Video files/{n;p;}' | sed 's/ //g')"
+        sleap_inspect_output=$(sleap-inspect "$OUTPUT_LABELS_FILE")
+        video_filename_from_inspect=$(grep -A1 "Video files" <<< $sleap_inspect_output)  
+        video_filename_from_inspect=$(tail -n 1 <<< $video_filename_from_inspect)  # get line after "Video files"
+        video_filename_from_inspect="$(echo $video_filename_from_inspect | sed 's/ //g')"  # remove spaces
 
         # print check
-        if [[ $video_filename_from_inspect == $video_filename ]]; then
+        if [[ "$video_filename_from_inspect" == "$video_filename" ]]; then
             echo "Output from sleap-inspect matches input filename $video_filename_from_inspect"
         else
             echo "Output from sleap-inspect ($video_filename_from_inspect) DOES NOT match input filename ($video_filename)"
