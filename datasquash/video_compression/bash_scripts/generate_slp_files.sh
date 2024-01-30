@@ -29,40 +29,50 @@ module load SLEAP
 # Input & output data
 # ----------------------
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
+
+# input videos
+INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos"
 INPUT_VIDEOS_LIST=(
-    "$PROJ_DIR/input-videos/20190128_113421.mp4"
-    "$PROJ_DIR/input-videos/20190128_113421_CRF17.mp4"
-    "$PROJ_DIR/input-videos/20190128_113421_CRF34.mp4"
-    "$PROJ_DIR/input-videos/20190128_113421_CRF51.mp4"
+    "$INPUT_VIDEOS_DIR/20190128_113421.mp4"
+    "$INPUT_VIDEOS_DIR/20190128_113421_CRF17.mp4"
+    "$INPUT_VIDEOS_DIR/20190128_113421_CRF34.mp4"
+    "$INPUT_VIDEOS_DIR/20190128_113421_CRF51.mp4"
 )
 
-SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+# labels directory
 SLEAP_LABELS_DIR="$PROJ_DIR/input-labels"
-mkdir -p $SLEAP_LABELS_DIR  # create if it doesnt exist
+SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
+labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
+mkdir -p $SLEAP_LABELS_DIR  # create directory if it doesn't exist
 
+# repository location
 DATASQUASH_REPO="/ceph/scratch/sminano/DataSquash"
 
+# ----------------------
+# Input data checks
+# ----------------------
 # Check len(list of input data) matches max SLURM_ARRAY_TASK_COUNT
 # if not, exit
 if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
-    echo "The number of array tasks does not match the number of inputs"
+    echo "The number of array tasks does not match the number of input videos"
     exit 1
 fi
 
-# -----------------------------------------------------
-# Generate SLEAP label files linked to each video
-# -----------------------------------------------------
-
-labels_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
+# ---------------------------------------------
+# Generate SLEAP label files for each video
+# ----------------------------------------------
 
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
+    # input video
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename="$(basename "$INPUT_VIDEO")"
 
-    video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
-    OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp
+    # output labels file
+    video_filename_no_ext="$(echo $video_filename | sed 's/\(.*\)\..*/\1/')"
+    OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp
 
+    # generate labels file for current video
     python "$DATASQUASH_REPO/datasquash/video_compression/generate_label_files.py" \
         $SLEAP_LABELS_REF_FILE \
         $video_filename \
@@ -70,5 +80,7 @@ do
 
     # check .slp file and print to logs
     sleap-inspect "$OUTPUT_LABELS_FILE"
+
+    # check if successful
 
 done
