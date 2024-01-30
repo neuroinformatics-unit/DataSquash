@@ -12,6 +12,14 @@
 #SBATCH --array=0-3%4
 
 
+# -----------------------------
+# Error settings for bash
+# -----------------------------
+# see https://wizardzines.com/comics/bash-errors/
+set -e  # do not continue after errors
+set -u  # throw error if variable is unset
+set -o pipefail  # make the pipe fail if any part of it fails
+
 # -------------------------------
 # Load most recent sleap module
 # ------------------------------
