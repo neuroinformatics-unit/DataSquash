@@ -93,6 +93,7 @@ do
         # get filename from sleap-inspect output
         sleap_inspect_output=$(sleap-inspect $OUTPUT_LABELS_FILE)
 
+        # TODO: refactor this section
         sleap_inspect_output=$(sleap-inspect "$OUTPUT_LABELS_FILE")
         video_filename_from_inspect=$(grep -A1 "Video files" <<< $sleap_inspect_output)  
         video_filename_from_inspect=$(tail -n 1 <<< $video_filename_from_inspect)  # get line after "Video files"
@@ -109,6 +110,9 @@ do
     fi
 
     # move logs
+    # TODO: refactor
+    # mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out} \
+    #     /$LOG_DIR/$(basename "$output_labels_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out}
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
