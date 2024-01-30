@@ -75,6 +75,7 @@ do
 
     # output labels file
     OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp
+    output_labels_no_ext="$(echo $OUTPUT_LABELS_FILE | sed 's/\(.*\)\..*/\1/')"
 
     # generate labels file for current video
     python "$DATASQUASH_REPO/datasquash/video_compression/generate_label_files.py" \
@@ -111,7 +112,7 @@ do
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-            /$LOG_DIR/$(basename "$OUTPUT_LABELS_FILE").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+            /$LOG_DIR/$(basename "$output_labels_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
         
 
