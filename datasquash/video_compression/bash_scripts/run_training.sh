@@ -68,13 +68,14 @@ do
     sleap-train \
         baseline.centroid.json \
         "$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp \
-        --video-paths "$INPUT_VIDEO" \
+        --video-paths "$INPUT_VIDEO" \  # maybe: "$PROJ_DIR/input-videos/ instead?
         --run_name $video_filename_no_ext \
         --suffix "_centroid_model" \
         --tensorboard
 
     # centred instance model
     sleap-train \
+        baseline_medium_rf.topdown.json \
         "$SLEAP_LABELS_DIR/$labels_filename_no_ext"_$video_filename_no_ext.slp \
         --video-paths "$INPUT_VIDEO" \
         --run_name $video_filename_no_ext \
