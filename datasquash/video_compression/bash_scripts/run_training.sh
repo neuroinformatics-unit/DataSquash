@@ -125,7 +125,7 @@ do
         echo "ERROR training centered instance model"
         echo "---"
     fi
-    
+
 
     # move models folder across
     mv models/ $PROJ_DIR/models
@@ -136,9 +136,7 @@ do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
             /$LOG_DIR/$(basename "$video_filename_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
-        
+
 
 
 done
-
-
