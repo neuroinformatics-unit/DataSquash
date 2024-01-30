@@ -45,7 +45,7 @@ SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/cour
 labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 mkdir -p $SLEAP_LABELS_DIR  # create directory if it doesn't exist
 
-# logs
+# logs directory
 LOG_DIR=$SLEAP_LABELS_DIR/logs
 mkdir -p $LOG_DIR  # create if it doesnt exist
 
@@ -86,16 +86,16 @@ do
     # collect status of previous command
     status_generate_slp_file=$?
 
-    # if successful: print to logs 
+    # if successful: print to logs
     # TODO: should this be in pytest instead?
     if [[ "$status_generate_slp_file" -eq 0 ]] ; then
-    
+
         # get filename from sleap-inspect output
         sleap_inspect_output=$(sleap-inspect $OUTPUT_LABELS_FILE)
 
         # TODO: refactor this section
         sleap_inspect_output=$(sleap-inspect "$OUTPUT_LABELS_FILE")
-        video_filename_from_inspect=$(grep -A1 "Video files" <<< $sleap_inspect_output)  
+        video_filename_from_inspect=$(grep -A1 "Video files" <<< $sleap_inspect_output)
         video_filename_from_inspect=$(tail -n 1 <<< $video_filename_from_inspect)  # get line after "Video files"
         video_filename_from_inspect="$(echo $video_filename_from_inspect | sed 's/ //g')"  # remove spaces
 
@@ -118,7 +118,7 @@ do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
             /$LOG_DIR/$(basename "$output_labels_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
-        
+
 
 
 done
