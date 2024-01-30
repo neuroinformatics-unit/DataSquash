@@ -15,9 +15,10 @@ def overwrite_video_in_slp_file(
     input_labels_path : str
         path to input SLEAP labels file (.slp).
     new_video_path : str
-        new video path to link to in SLEAP labels file (.slp). If only a
-        filename is provided, the video will be search in the directory of
-        the .slp file. Needs to be an acceptable extension (e.g. mp4, not MP4)
+        new video (path or filename) to link to in SLEAP labels file (.slp).
+        If only a filename is provided, the video will be first searched in
+        the directory of the .slp file. Needs to be an acceptable extension
+        (e.g. mp4, not MP4).
     output_labels_path : str
         path to output SLEAP labels file (.slp)
     """
@@ -53,7 +54,6 @@ def argument_parser() -> argparse.Namespace:
     )
     parser.add_argument(
         "new_video_path",
-        nargs="*",
         help=(
             "new video path to link to in SLEAP labels file (.slp). "
             "If only a filename is provided, the video will be search in "
