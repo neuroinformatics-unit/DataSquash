@@ -33,14 +33,14 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#CRF_VALUES[@]} ]]; then
 fi
 
 
-# location of SLURM logs
-LOG_DIR=$PROJ_DIR/logs
-mkdir -p $LOG_DIR  # create if it doesnt exist
-
 # set location of reencoded videos
 REENCODED_VIDEOS_DIR=$PROJ_DIR/$OUTPUT_SUBDIR
 mkdir -p $REENCODED_VIDEOS_DIR # create if it doesnt exist
 
+
+# location of SLURM logs
+LOG_DIR=$REENCODED_VIDEOS_DIR/logs
+mkdir -p $LOG_DIR  # create if it doesnt exist
 
 # ----------------------------------------
 # Compress with different values of crf
