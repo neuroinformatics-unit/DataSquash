@@ -74,9 +74,9 @@ do
     echo "--------"
 
     # Path to reencoded video
-    filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')" # filename without extension
-    filename_out_no_ext="$filename_no_ext"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"
-    REENCODED_VIDEO_PATH_MP4="$REENCODED_VIDEOS_DIR/$filename_out_no_ext".mp4  # must be .mp4
+    FILENAME_NO_EXT="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')" # filename without extension
+    FILENAME_OUT_NO_EXT="$FILENAME_NO_EXT"_CRF"${CRF_VALUES[${SLURM_ARRAY_TASK_ID}]}"
+    REENCODED_VIDEO_PATH_MP4="$REENCODED_VIDEOS_DIR/$FILENAME_OUT_NO_EXT".mp4  # must be .mp4
 
     # Print current node
     echo "SLURM node: $SLURMD_NODENAME"
@@ -105,11 +105,11 @@ do
     "$REENCODED_VIDEO_PATH_MP4"
 
     # collect status of previous command
-    status_ffmpeg_compress=$?
+    STATUS_FFMPEG_COMPRESS=$?
 
 
     # print only if previous command is successful
-    if [[ "$status_ffmpeg_compress" -eq 0 ]] ; then
+    if [[ "$STATUS_FFMPEG_COMPRESS" -eq 0 ]] ; then
         echo "Reencoded video: $REENCODED_VIDEO_PATH_MP4"
         echo "--------"
     else
@@ -119,6 +119,6 @@ do
 
     # Move logs across
     mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out} \
-    /$LOG_DIR/"$filename_out_no_ext".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out}
+    /$LOG_DIR/"$FILENAME_OUT_NO_EXT".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out}
 
 done
