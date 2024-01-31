@@ -23,6 +23,10 @@ classifiers = [
     "License :: OSI Approved :: BSD License",
 ]
 
+dependencies = [
+    "sleap"
+]
+
 [project.urls]
 "Homepage" = "https://github.com/neuroinformatics-unit/DataSquash"
 "Bug Tracker" = "https://github.com/neuroinformatics-unit/DataSquash/issues"
