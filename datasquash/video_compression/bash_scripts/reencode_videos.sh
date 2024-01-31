@@ -90,13 +90,12 @@ do
     ffprobe -v error -show_streams $INPUT_VIDEO
 
     # Run compression with the corresponding CRF value
-    # - y: overwrite output files without asking.
     # - c:v: specify codec for the video stream
     #   (decoder if used in front of input, encoder if used in front of output).
     # - libx264: sets the video compression to use H264. If RGB, use libx264rgb
     # - preset superfast: sets a number of parameters that pressumably enable reliable seeking
     # - c:a # keep audio stream as is if present
-    ffmpeg -y -i "$INPUT_VIDEO" \
+    ffmpeg -i "$INPUT_VIDEO" \
     -c:v libx264 \
     -pix_fmt yuv420p \
     -preset superfast \
