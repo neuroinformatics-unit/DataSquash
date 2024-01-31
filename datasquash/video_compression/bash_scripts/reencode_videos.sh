@@ -118,7 +118,10 @@ do
     fi
 
     # Move logs across
-    mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out} \
-    /$LOG_DIR/"$FILENAME_OUT_NO_EXT".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out}
+    for ext in err out
+        do
+            mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
+            /$LOG_DIR/"$FILENAME_OUT_NO_EXT".slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+        done
 
 done
