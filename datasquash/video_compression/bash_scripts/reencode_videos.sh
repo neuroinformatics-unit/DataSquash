@@ -39,7 +39,7 @@ PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
 INPUT_VIDEO=$PROJ_DIR/input-videos/20190128_113421.mp4
 
 # output directory (location of reencoded videos)
-REENCODED_VIDEOS_DIR=$PROJ_DIR/input-videos
+REENCODED_VIDEOS_DIR=$PROJ_DIR/input-videos/slurm_array.$SLURM_ARRAY_JOB_ID
 mkdir -p $REENCODED_VIDEOS_DIR # create if it doesnt exist
 
 # logs directory
