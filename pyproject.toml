@@ -24,7 +24,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "sleap"
+    "sleap[pypi]==1.3.3",
 ]
 
 [project.urls]
