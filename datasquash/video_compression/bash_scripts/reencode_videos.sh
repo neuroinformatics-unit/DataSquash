@@ -46,6 +46,8 @@ mkdir -p $REENCODED_VIDEOS_DIR # create if it doesnt exist
 LOG_DIR=$REENCODED_VIDEOS_DIR/logs
 mkdir -p $LOG_DIR  # create if it doesnt exist
 
+# whether to copy the raw video to the output directory
+FLAG_COPY_RAW_TO_REENCODED_DIR=true
 
 # ----------------------
 # Encoding parameters
@@ -124,3 +126,10 @@ do
         done
 
 done
+
+# ----------------------------------------------------
+# Copy input video to output directoy if required
+# ----------------------------------------------------
+if [ "$FLAG_COPY_RAW_TO_REENCODED_DIR" = true ]; then
+    cp $INPUT_VIDEO $REENCODED_VIDEOS_DIR/
+fi
