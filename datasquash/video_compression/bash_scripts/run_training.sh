@@ -133,7 +133,8 @@ do
 
 
     # move models folder across
-    mv models/ $MODELS_DIR/
+    # use rsync to merge each job in array with potentially pre-existing folder
+    rsync -a models/ $MODELS_DIR/
 
     # move logs across
     for ext in err out
@@ -142,6 +143,7 @@ do
             /$LOG_DIR/$video_filename_no_ext.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
 
-
-
 done
+
+# clear models folder
+rm -rf models
