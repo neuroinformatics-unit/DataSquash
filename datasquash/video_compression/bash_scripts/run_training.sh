@@ -73,7 +73,7 @@ fi
 
 # Create a directory for the SLEAP output of this run
 SLEAP_OUTPUT_TMP_DIR=slurm_array.$SLURM_ARRAY_JOB_ID
-mkdir $SLEAP_OUTPUT_TMP_DIR
+mkdir -p $SLEAP_OUTPUT_TMP_DIR
 cd $SLEAP_OUTPUT_TMP_DIR
 
 
