@@ -13,19 +13,20 @@ def overwrite_video_in_slp_file(
     Parameters
     ----------
     input_labels_path : str
-        path to input SLEAP labels file (.slp).
+        path to input SLEAP labels file (.slp), with labels defined
+        for one video only.
     new_video_path : str
         new video (path or filename) to link to in SLEAP labels file (.slp).
         If only a filename is provided, the video will be first searched in
-        the directory of the .slp file. Needs to be an acceptable extension
-        (e.g. mp4, not MP4).
+        the directory where the .slp file is. The video filename needs to have
+        an acceptable extension (e.g. "mp4", not "MP4").
     output_labels_path : str
-        path to output SLEAP labels file (.slp)
+        path to the output SLEAP labels file (.slp)
     """
-    # Load slp file with predefined video search path
+    # Load slp file with a predefined video search path
     labels = sleap.Labels.load_file(
         input_labels_path,
-        new_video_path,  # if I specify filename it will look for this file
+        new_video_path,
     )
 
     # Check only one video and correctly assigned
@@ -40,7 +41,7 @@ def overwrite_video_in_slp_file(
 
 
 def argument_parser() -> argparse.Namespace:
-    """Generate argument parser for .slp file generation.
+    """Generate parser for .slp file generation.
 
     Returns
     -------
@@ -50,7 +51,10 @@ def argument_parser() -> argparse.Namespace:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "input_slp",
-        help="path to the input SLEAP labels file (.slp)",
+        help=(
+            "path to the input SLEAP labels file (.slp) with "
+            "labels defined on one video only."
+        ),
     )
     parser.add_argument(
         "new_video_path",
