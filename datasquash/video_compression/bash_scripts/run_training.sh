@@ -79,6 +79,10 @@ fi
 # ------------------------------------------------------
 # Train a topdown SLEAP model for each reencoded video
 # ------------------------------------------------------
+# Print job ID that generated the compressed videos and labels
+echo "Compressed videos were generated in job with ID $INPUT_VIDEOS_JOB_ID"
+echo "SLEAP label files were generated in job with ID $SLEAP_LABELS_JOB_ID"
+echo  "---------"
 
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
