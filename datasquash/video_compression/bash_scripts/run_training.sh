@@ -71,9 +71,10 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
     exit 1
 fi
 
-# TODO: check input labels files match video files?
-# labels files assumed to follow the naming convention:
-#  <SLEAP_LABELS_REF_FILE>_<VIDEO_FILENAME_NO_EXT>.slp
+# Create a directory for the SLEAP output of this run
+SLEAP_OUTPUT_TMP_DIR=slurm_array.$SLURM_ARRAY_JOB_ID
+mkdir $SLEAP_OUTPUT_TMP_DIR
+cd $SLEAP_OUTPUT_TMP_DIR
 
 
 # ------------------------------------------------------
@@ -149,5 +150,6 @@ do
 
 done
 
-# clear models folder
-rm -rf models
+# Delete SLEAP temporary output directory (ok?)
+cd ..
+rm -rf $SLEAP_OUTPUT_TMP_DIR
