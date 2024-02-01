@@ -71,10 +71,6 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
     exit 1
 fi
 
-# Create a directory for the SLEAP output of this run
-
-
-
 # ------------------------------------------------------
 # Train a topdown SLEAP model for each reencoded video
 # ------------------------------------------------------
@@ -90,7 +86,7 @@ do
     VIDEO_FILENAME_NO_EXT="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
 
-    # create a temporary directory for this job in the batch and cd there
+    # Create a temporary directory for this job in the batch and cd there
     SLEAP_OUTPUT_TMP_DIR=slurm_array."$SLURM_ARRAY_JOB_ID"_"$SLURM_ARRAY_TASK_ID"
     mkdir $SLEAP_OUTPUT_TMP_DIR
     cd $SLEAP_OUTPUT_TMP_DIR
