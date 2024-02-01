@@ -85,12 +85,16 @@ do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     VIDEO_FILENAME_NO_EXT="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
+    echo "--------"
 
     # Create a temporary directory for this job in the batch and cd there
     SLEAP_OUTPUT_TMP_DIR=slurm_array."$SLURM_ARRAY_JOB_ID"_"$SLURM_ARRAY_TASK_ID"
     mkdir $SLEAP_OUTPUT_TMP_DIR
     cd $SLEAP_OUTPUT_TMP_DIR
 
+    # Print current node
+    echo "SLURM node: $SLURMD_NODENAME"
+    echo "--------"
 
     # train centroid model
     # TODO: --video-paths maybe "$PROJ_DIR/input-videos/ instead?
