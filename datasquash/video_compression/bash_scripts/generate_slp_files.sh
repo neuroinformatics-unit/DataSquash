@@ -43,7 +43,7 @@ INPUT_VIDEOS_LIST=(
 # labels directory
 SLEAP_LABELS_DIR="$PROJ_DIR/input-labels/slurm_array.$SLURM_ARRAY_JOB_ID"
 SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
-labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
+LABELS_REF_FILENAME_NO_EXT="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 mkdir -p $SLEAP_LABELS_DIR  # create directory if it doesn't exist
 
 # logs directory
@@ -75,47 +75,47 @@ for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     # input video
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-    video_filename="$(basename "$INPUT_VIDEO")"
-    video_filename_no_ext="$(echo $video_filename | sed 's/\(.*\)\..*/\1/')"
+    VIDEO_FILENAME="$(basename "$INPUT_VIDEO")"
+    VIDEO_FILENAME_NO_EXT="$(echo $VIDEO_FILENAME | sed 's/\(.*\)\..*/\1/')"
 
     echo "Input video: $INPUT_VIDEO"
     echo "--------"
 
     # output labels file
-    OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp
-    output_labels_no_ext="$(echo $OUTPUT_LABELS_FILE | sed 's/\(.*\)\..*/\1/')"
+    OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$LABELS_REF_FILENAME_NO_EXT"_$VIDEO_FILENAME_NO_EXT.slp
+    OUTPUT_LABELS_NO_EXT="$(echo $OUTPUT_LABELS_FILE | sed 's/\(.*\)\..*/\1/')"
 
     # generate labels file for current video
     python "$DATASQUASH_REPO/datasquash/video_compression/generate_label_files.py" \
         $SLEAP_LABELS_REF_FILE \
-        $video_filename \
+        $VIDEO_FILENAME \
         $OUTPUT_LABELS_FILE
 
     # collect status of previous command
-    status_generate_slp_file=$?
+    STATUS_GENERATE_SLP_FILE=$?
 
     # if successful: print to logs
     # TODO: should this be in pytest instead?
-    if [[ "$status_generate_slp_file" -eq 0 ]] ; then
+    if [[ "$STATUS_GENERATE_SLP_FILE" -eq 0 ]] ; then
 
         # print to logs
         echo "SLEAP labels file generated for $INPUT_VIDEO: $OUTPUT_LABELS_FILE"
         echo "--------"
 
         # get filename from sleap-inspect output
-        sleap_inspect_output=$(sleap-inspect $OUTPUT_LABELS_FILE)
+        SLEAP_INSPECT_OUTPUT=$(sleap-inspect $OUTPUT_LABELS_FILE)
 
         # TODO: refactor this section
-        sleap_inspect_output=$(sleap-inspect "$OUTPUT_LABELS_FILE")
-        video_filename_from_inspect=$(grep -A1 "Video files" <<< $sleap_inspect_output)
-        video_filename_from_inspect=$(tail -n 1 <<< $video_filename_from_inspect)  # get line after "Video files"
-        video_filename_from_inspect="$(echo $video_filename_from_inspect | sed 's/ //g')"  # remove spaces
+        SLEAP_INSPECT_OUTPUT=$(sleap-inspect "$OUTPUT_LABELS_FILE")
+        VIDEO_FILENAME_FROM_INSPECT=$(grep -A1 "Video files" <<< $SLEAP_INSPECT_OUTPUT)
+        VIDEO_FILENAME_FROM_INSPECT=$(tail -n 1 <<< $VIDEO_FILENAME_FROM_INSPECT)  # get line after "Video files"
+        VIDEO_FILENAME_FROM_INSPECT="$(echo $VIDEO_FILENAME_FROM_INSPECT | sed 's/ //g')"  # remove spaces
 
         # print check
-        if [[ "$video_filename_from_inspect" == "$video_filename" ]]; then
-            echo "Output from sleap-inspect matches input filename $video_filename_from_inspect"
+        if [[ "$VIDEO_FILENAME_FROM_INSPECT" == "$VIDEO_FILENAME" ]]; then
+            echo "Output from sleap-inspect matches input filename $VIDEO_FILENAME_FROM_INSPECT"
         else
-            echo "Output from sleap-inspect ($video_filename_from_inspect) DOES NOT match input filename ($video_filename)"
+            echo "Output from sleap-inspect ($VIDEO_FILENAME_FROM_INSPECT) DOES NOT match input filename ($VIDEO_FILENAME)"
         fi
     else
         echo "Generation of .slp files FAILED for $INPUT_VIDEO"
@@ -125,7 +125,7 @@ do
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-            /$LOG_DIR/$(basename "$output_labels_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+            /$LOG_DIR/$(basename "$OUTPUT_LABELS_NO_EXT").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
 
 
