@@ -41,7 +41,7 @@ PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
 INPUT_VIDEOS_JOB_ID="slurm_array.4468024"
 INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos/$INPUT_VIDEOS_JOB_ID"
 INPUT_VIDEOS_LIST=(
-    "/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4"
+    "$PROJ_DIR/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4"
     "$INPUT_VIDEOS_DIR/20190128_113421_CRF17.mp4"
     "$INPUT_VIDEOS_DIR/20190128_113421_CRF34.mp4"
     "$INPUT_VIDEOS_DIR/20190128_113421_CRF51.mp4"
