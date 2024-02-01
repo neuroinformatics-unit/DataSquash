@@ -51,7 +51,7 @@ INPUT_VIDEOS_LIST=(
 SLEAP_LABELS_JOB_ID="slurm_array.4468963"
 SLEAP_LABELS_DIR="$PROJ_DIR/input-labels/$SLEAP_LABELS_JOB_ID"
 SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
-labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
+LABELS_REF_FILENAME_NO_EXT="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 
 # output models directory
 MODELS_DIR=$PROJ_DIR/models/slurm_array.$SLURM_ARRAY_JOB_ID
@@ -73,7 +73,7 @@ fi
 
 # TODO: check input labels files match video files?
 # labels files assumed to follow the naming convention:
-#  <SLEAP_LABELS_REF_FILE>_<video_filename_no_ext>.slp
+#  <SLEAP_LABELS_REF_FILE>_<VIDEO_FILENAME_NO_EXT>.slp
 
 
 # ------------------------------------------------------
@@ -84,16 +84,16 @@ for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     # input video
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
-    video_filename_no_ext="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
+    VIDEO_FILENAME_NO_EXT="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
 
     # train centroid model
     # TODO: --video-paths maybe "$PROJ_DIR/input-videos/ instead?
     sleap-train \
         baseline.centroid.json \
-        "$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp \
+        "$SLEAP_LABELS_DIR/$LABELS_REF_FILENAME_NO_EXT"_$VIDEO_FILENAME_NO_EXT.slp \
         --video-paths "$INPUT_VIDEO" \
-        --run_name $video_filename_no_ext \
+        --run_name $VIDEO_FILENAME_NO_EXT \
         --suffix "_centroid_model" \
         --tensorboard
 
@@ -113,9 +113,9 @@ do
     # train centred instance model
     sleap-train \
         baseline_medium_rf.topdown.json \
-        "$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp \
+        "$SLEAP_LABELS_DIR/$LABELS_REF_FILENAME_NO_EXT"_$VIDEO_FILENAME_NO_EXT.slp \
         --video-paths "$INPUT_VIDEO" \
-        --run_name $video_filename_no_ext \
+        --run_name $VIDEO_FILENAME_NO_EXT \
         --suffix "_centered_instance_model" \
         --tensorboard
 
@@ -140,7 +140,7 @@ do
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-            /$LOG_DIR/$video_filename_no_ext.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+            /$LOG_DIR/$VIDEO_FILENAME_NO_EXT.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
 
 done
