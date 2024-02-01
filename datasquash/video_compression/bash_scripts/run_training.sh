@@ -38,7 +38,8 @@ module load SLEAP
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
 
 # input videos
-INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos"
+INPUT_VIDEOS_JOB_ID="slurm_array.4468024"
+INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos/$INPUT_VIDEOS_JOB_ID"
 INPUT_VIDEOS_LIST=(
     "$INPUT_VIDEOS_DIR/20190128_113421.mp4"
     "$INPUT_VIDEOS_DIR/20190128_113421_CRF17.mp4"
@@ -47,14 +48,18 @@ INPUT_VIDEOS_LIST=(
 )
 
 # input labels
-SLEAP_LABELS_DIR="$PROJ_DIR/input-labels"
+SLEAP_LABELS_JOB_ID="slurm_array.4468963"
+SLEAP_LABELS_DIR="$PROJ_DIR/input-labels/$SLEAP_LABELS_JOB_ID"
 SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
 labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 
-# save logs inside SLEAP model folder
-LOG_DIR=$PROJ_DIR/models/logs
-mkdir -p $LOG_DIR  # create if it doesnt exist
+# output models directory
+MODELS_DIR=$PROJ_DIR/models/slurm_array.$SLURM_ARRAY_JOB_ID
+mkdir -p $MODELS_DIR  # create if it doesnt exist
 
+# logs directory
+LOG_DIR=$MODELS_DIR/logs
+mkdir -p $LOG_DIR  # create if it doesnt exist
 
 # ----------------------
 # Input data checks
@@ -66,7 +71,7 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
     exit 1
 fi
 
-# TODO: check input labels files match video files
+# TODO: check input labels files match video files?
 # labels files assumed to follow the naming convention:
 #  <SLEAP_LABELS_REF_FILE>_<video_filename_no_ext>.slp
 
@@ -89,7 +94,7 @@ do
         "$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp \
         --video-paths "$INPUT_VIDEO" \
         --run_name $video_filename_no_ext \
-        --suffix "_centroid_model.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID" \
+        --suffix "_centroid_model" \
         --tensorboard
 
     # collect status of previous command
@@ -111,7 +116,7 @@ do
         "$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp \
         --video-paths "$INPUT_VIDEO" \
         --run_name $video_filename_no_ext \
-        --suffix "_centered_instance_model.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID" \
+        --suffix "_centered_instance_model" \
         --tensorboard
 
     # collect status of previous command
@@ -128,13 +133,13 @@ do
 
 
     # move models folder across
-    mv models/ $PROJ_DIR/models
+    mv models/ $MODELS_DIR/
 
     # move logs across
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
-            /$LOG_DIR/$(basename "$video_filename_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+            /$LOG_DIR/$video_filename_no_ext.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
 
 
