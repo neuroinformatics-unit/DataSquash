@@ -72,9 +72,7 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#INPUT_VIDEOS_LIST[@]} ]]; then
 fi
 
 # Create a directory for the SLEAP output of this run
-SLEAP_OUTPUT_TMP_DIR=slurm_array.$SLURM_ARRAY_JOB_ID
-mkdir -p $SLEAP_OUTPUT_TMP_DIR
-cd $SLEAP_OUTPUT_TMP_DIR
+
 
 
 # ------------------------------------------------------
@@ -91,6 +89,12 @@ do
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     VIDEO_FILENAME_NO_EXT="$(basename "$INPUT_VIDEO" | sed 's/\(.*\)\..*/\1/')"
     echo "Input video: $INPUT_VIDEO"
+
+    # create a temporary directory for this job in the batch and cd there
+    SLEAP_OUTPUT_TMP_DIR=slurm_array."$SLURM_ARRAY_JOB_ID"_"$SLURM_ARRAY_TASK_ID"
+    mkdir $SLEAP_OUTPUT_TMP_DIR
+    cd $SLEAP_OUTPUT_TMP_DIR
+
 
     # train centroid model
     # TODO: --video-paths maybe "$PROJ_DIR/input-videos/ instead?
@@ -148,8 +152,9 @@ do
             /$LOG_DIR/$VIDEO_FILENAME_NO_EXT.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
         done
 
-done
+    # Delete SLEAP temporary output directory (ok?)
+    cd ..
+    rm -rf $SLEAP_OUTPUT_TMP_DIR
 
-# Delete SLEAP temporary output directory (ok?)
-cd ..
-rm -rf $SLEAP_OUTPUT_TMP_DIR
+
+done
