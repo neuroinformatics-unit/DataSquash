@@ -31,7 +31,8 @@ module load SLEAP
 PROJ_DIR=/ceph/neuroinformatics/neuroinformatics/sminano/video-compression/
 
 # input videos
-INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos"
+INPUT_VIDEOS_JOB_ID="slurm_array.4468021"
+INPUT_VIDEOS_DIR="$PROJ_DIR/input-videos/$INPUT_VIDEOS_JOB_ID"
 INPUT_VIDEOS_LIST=(
     "$INPUT_VIDEOS_DIR/20190128_113421.mp4"
     "$INPUT_VIDEOS_DIR/20190128_113421_CRF17.mp4"
@@ -40,7 +41,7 @@ INPUT_VIDEOS_LIST=(
 )
 
 # labels directory
-SLEAP_LABELS_DIR="$PROJ_DIR/input-labels"
+SLEAP_LABELS_DIR="$PROJ_DIR/input-labels/slurm_array.$SLURM_ARRAY_JOB_ID"
 SLEAP_LABELS_REF_FILE="$PROJ_DIR/datasets/drosophila-melanogaster-courtship/courtship_labels.slp"
 labels_ref_filename_no_ext="$(basename "$SLEAP_LABELS_REF_FILE" | sed 's/\(.*\)\..*/\1/')"
 mkdir -p $SLEAP_LABELS_DIR  # create directory if it doesn't exist
@@ -66,12 +67,19 @@ fi
 # Generate SLEAP label files for each video
 # ----------------------------------------------
 
+# Print job ID that generated the input videos
+echo "Input videos generated in SLURM job ID $INPUT_VIDEOS_JOB_ID"
+echo  "---------"
+
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
 do
     # input video
     INPUT_VIDEO=${INPUT_VIDEOS_LIST[${SLURM_ARRAY_TASK_ID}]}
     video_filename="$(basename "$INPUT_VIDEO")"
     video_filename_no_ext="$(echo $video_filename | sed 's/\(.*\)\..*/\1/')"
+
+    echo "Input video: $INPUT_VIDEO"
+    echo "--------"
 
     # output labels file
     OUTPUT_LABELS_FILE="$SLEAP_LABELS_DIR/$labels_ref_filename_no_ext"_$video_filename_no_ext.slp
@@ -89,6 +97,10 @@ do
     # if successful: print to logs
     # TODO: should this be in pytest instead?
     if [[ "$status_generate_slp_file" -eq 0 ]] ; then
+
+        # print to logs
+        echo "SLEAP labels file generated for $INPUT_VIDEO: $OUTPUT_LABELS_FILE"
+        echo "--------"
 
         # get filename from sleap-inspect output
         sleap_inspect_output=$(sleap-inspect $OUTPUT_LABELS_FILE)
@@ -110,9 +122,6 @@ do
     fi
 
     # move logs
-    # TODO: refactor
-    # mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out} \
-    #     /$LOG_DIR/$(basename "$output_labels_no_ext").slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.{err,out}
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
