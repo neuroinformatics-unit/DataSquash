@@ -68,7 +68,7 @@ fi
 # ----------------------------------------------
 
 # Print job ID that generated the input videos
-echo "Input videos generated in SLURM job ID $INPUT_VIDEOS_JOB_ID"
+echo "Input videos were generated in job with ID $INPUT_VIDEOS_JOB_ID"
 echo  "---------"
 
 for i in {1..${SLURM_ARRAY_TASK_COUNT}}
@@ -99,7 +99,7 @@ do
     if [[ "$STATUS_GENERATE_SLP_FILE" -eq 0 ]] ; then
 
         # print to logs
-        echo "SLEAP labels file generated for $INPUT_VIDEO: $OUTPUT_LABELS_FILE"
+        echo "SLEAP labels file generated for $VIDEO_FILENAME at $OUTPUT_LABELS_FILE"
         echo "--------"
 
         # get filename from sleap-inspect output
@@ -113,7 +113,7 @@ do
 
         # print check
         if [[ "$VIDEO_FILENAME_FROM_INSPECT" == "$VIDEO_FILENAME" ]]; then
-            echo "Output from sleap-inspect matches input filename $VIDEO_FILENAME_FROM_INSPECT"
+            echo "Output from sleap-inspect matches input filename ($VIDEO_FILENAME_FROM_INSPECT)"
         else
             echo "Output from sleap-inspect ($VIDEO_FILENAME_FROM_INSPECT) DOES NOT match input filename ($VIDEO_FILENAME)"
         fi
