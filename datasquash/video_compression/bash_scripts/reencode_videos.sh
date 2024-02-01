@@ -65,6 +65,13 @@ if [[ $SLURM_ARRAY_TASK_COUNT -ne ${#CRF_VALUES[@]} ]]; then
     exit 1
 fi
 
+# Print whether input video will be copied over or not
+if [ "$FLAG_COPY_RAW_TO_REENCODED_DIR" = true ]; then
+    echo "Input video will be copied over to $REENCODED_VIDEOS_DIR"
+else
+    echo "Input video will NOT be copied over to $REENCODED_VIDEOS_DIR"
+fi
+
 
 # ----------------------------------------------------
 # Compress input video with different values of crf
