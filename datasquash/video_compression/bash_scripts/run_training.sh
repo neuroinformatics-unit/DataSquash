@@ -141,20 +141,47 @@ do
     fi
 
 
-    # move models folder across
+    # Move models folder to final destination
     # use rsync to merge each job in array with potentially pre-existing folder
     rsync -a models/ $MODELS_DIR/
 
-    # move logs across
+    status_models_copy=$?
+    if [[ "$status_models_copy" -eq 0 ]] ; then
+        echo "Models folder copied correctly to $MODELS_DIR"
+        echo "---"
+    else
+        echo "ERROR copying models folder to $MODELS_DIR"
+        echo "---"
+    fi
+
+    # Move one level up and delete directory for SLEAP temporary output
+    cd ..
+    rm -rf $SLEAP_OUTPUT_TMP_DIR
+
+    status_models_tmp_delete=$?
+    if [[ "$status_models_tmp_delete" -eq 0 ]] ; then
+        echo "Models tmp folder deleted correctly ($SLEAP_OUTPUT_TMP_DIR)"
+        echo "---"
+    else
+        echo "ERROR deleting models tmp folder $SLEAP_OUTPUT_TMP_DIR"
+        echo "---"
+    fi
+
+    # Move logs to output directory
+    # (logs are created where sbatch command is run)
     for ext in err out
         do
             mv slurm_array.$SLURMD_NODENAME.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext \
             /$LOG_DIR/$VIDEO_FILENAME_NO_EXT.slurm_array.$SLURM_ARRAY_JOB_ID-$SLURM_ARRAY_TASK_ID.$ext
+
+            status_logs_delete=$?
+            if [[ "$status_logs_delete" -eq 0 ]] ; then
+                echo "Log file (.$ext) moved correctly to $LOG_DIR"
+                echo "---"
+            else
+                echo "ERROR moving log file (.$ext) to $LOG_DIR"
+                echo "---"
+            fi
         done
-
-    # Delete SLEAP temporary output directory (ok?)
-    cd ..
-    rm -rf $SLEAP_OUTPUT_TMP_DIR
-
 
 done
