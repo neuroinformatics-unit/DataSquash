@@ -1,6 +1,8 @@
-VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship/"
+VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship"
 OUTPUT_DIR = "output"
 import os
+from pathlib import Path
+
 VIDEO_FILES =  [
     f for f in os.listdir(VIDEO_DIR)
     if f.endswith('.mp4')
@@ -16,7 +18,7 @@ rule all:
 
 rule video_encoding:
     input:
-        video = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship/{filename}",
+        video = Path(VIDEO_DIR) / "{filename}" # to use wildcards in Python we need to convert them to strings
     output:
         encoded_video = "{output_dir}/log_{filename}.txt"
     shell:
