@@ -1,6 +1,5 @@
 VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship/"
-OUTPUT_DIR = "output/"
-
+OUTPUT_DIR = "output"
 import os
 VIDEO_FILES =  [
     f for f in os.listdir(VIDEO_DIR)
@@ -12,8 +11,8 @@ rule all:
         expand(
             "{output_dir}/log_{filename}.txt",
             filename=VIDEO_FILES,
-            output_dir=OUTPUT_DIR
-        )
+            output_dir=OUTPUT_DIR,
+        )  # equiv to list compreh; has to match output for the upstream rule; has to be first
 
 rule video_encoding:
     input:
