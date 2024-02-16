@@ -1,7 +1,8 @@
-VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship"
-OUTPUT_DIR = "output"
 import os
 from pathlib import Path
+
+VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship"
+OUTPUT_DIR = "output"
 
 VIDEO_FILES =  [
     f for f in os.listdir(VIDEO_DIR)
