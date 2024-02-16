@@ -1,0 +1,26 @@
+import os
+from pathlib import Path
+
+VIDEO_DIR = "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship"
+OUTPUT_DIR = "output"
+
+VIDEO_FILES =  [
+    f for f in os.listdir(VIDEO_DIR)
+    if f.endswith('.mp4')
+]
+
+rule all:
+    input:
+        expand(
+            "{output_dir}/log_{filename}.txt",
+            filename=VIDEO_FILES,
+            output_dir=OUTPUT_DIR,
+        )  # equiv to list compreh; has to match output for the upstream rule; has to be first
+
+rule video_encoding:
+    input:
+        video = Path(VIDEO_DIR) / "{filename}" # to use wildcards in Python we need to convert them to strings
+    output:
+        encoded_video = "{output_dir}/log_{filename}.txt"
+    shell:
+        "ffprobe -v error -show_streams {input.video} > {output.encoded_video}"
