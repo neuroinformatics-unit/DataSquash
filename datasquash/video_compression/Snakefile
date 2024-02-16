@@ -1,0 +1,7 @@
+rule video_encoding:
+    input:
+        "/Users/sofia/swc/project_DataSquash_video/datasets/drosophila-melanogaster-courtship/20190128_113421.mp4",
+    output:
+        "/Users/sofia/swc/project_DataSquash_video/DataSquash/output/log.txt"
+    shell:
+        "ffprobe -v error -show_streams {input} > {output}"

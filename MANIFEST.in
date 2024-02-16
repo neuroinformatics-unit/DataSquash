@@ -8,3 +8,4 @@ recursive-exclude docs *
 recursive-exclude tests *
 
 recursive-include datasquash *.sh
+recursive-include datasquash Snakefile
